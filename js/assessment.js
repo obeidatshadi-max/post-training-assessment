@@ -117,10 +117,72 @@ async function handleStart() {
   renderQuestion(currentQ);
 }
 
-// ── Stubs (filled in Tasks 5 & 6) ────────────────
-function renderQuestion(index) { /* Task 5 */ }
-function prevQuestion() { /* Task 5 */ }
-function nextQuestion() { /* Task 5 */ }
+// ── MCQ ───────────────────────────────────────────
+function renderQuestion(index) {
+  const q = QUESTIONS[index];
+  const total = QUESTIONS.length;
+  const pct = Math.round(((index + 1) / total) * 100);
+
+  document.getElementById('progressLabel').textContent = t('questionOf', lang, { n: index + 1 });
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('questionText').textContent = q[lang] || q.en;
+
+  const list = document.getElementById('optionsList');
+  list.innerHTML = '';
+  q.options.forEach(opt => {
+    const li = document.createElement('li');
+    li.className = 'option-item';
+    const isChecked = answers[q.id] === opt.key;
+    li.innerHTML = `
+      <input type="radio" name="mcq_option" id="opt_${opt.key}" value="${opt.key}"${isChecked ? ' checked' : ''} />
+      <label for="opt_${opt.key}">
+        <span class="option-key">${opt.key.toUpperCase()}</span>
+        ${opt[lang] || opt.en}
+      </label>`;
+    li.querySelector('input').addEventListener('change', () => {
+      answers[q.id] = opt.key;
+    });
+    list.appendChild(li);
+  });
+
+  // Hide prev on first question
+  document.getElementById('prevBtn').style.display = index === 0 ? 'none' : '';
+  // Last question next button still says "Next" — navigates to open questions
+  document.getElementById('nextBtn').textContent = t('nextBtn', lang);
+}
+
+function prevQuestion() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion(currentQ);
+    window.scrollTo(0, 0);
+  }
+}
+
+function nextQuestion() {
+  const q = QUESTIONS[currentQ];
+  if (!answers[q.id]) {
+    // Briefly highlight the options list to indicate selection needed
+    const list = document.getElementById('optionsList');
+    list.style.outline = '2px solid var(--danger)';
+    list.style.borderRadius = '8px';
+    setTimeout(() => {
+      list.style.outline = '';
+      list.style.borderRadius = '';
+    }, 800);
+    return;
+  }
+  if (currentQ < QUESTIONS.length - 1) {
+    currentQ++;
+    renderQuestion(currentQ);
+    window.scrollTo(0, 0);
+  } else {
+    // All MCQ answered — go to open questions
+    showScreen('screenOpen');
+  }
+}
+
+// ── Submit stub (Task 6) ──────────────────────────
 function handleSubmit() { /* Task 6 */ }
 
 // ── Init ──────────────────────────────────────────
