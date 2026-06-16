@@ -133,15 +133,28 @@ function renderQuestion(index) {
     const li = document.createElement('li');
     li.className = 'option-item';
     const isChecked = answers[q.id] === opt.key;
-    li.innerHTML = `
-      <input type="radio" name="mcq_option" id="opt_${opt.key}" value="${opt.key}"${isChecked ? ' checked' : ''} />
-      <label for="opt_${opt.key}">
-        <span class="option-key">${opt.key.toUpperCase()}</span>
-        ${opt[lang] || opt.en}
-      </label>`;
-    li.querySelector('input').addEventListener('change', () => {
+
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = `mcq_${q.id}`;
+    radio.id = `opt_${opt.key}`;
+    radio.value = opt.key;
+    if (isChecked) radio.checked = true;
+    radio.addEventListener('change', () => {
       answers[q.id] = opt.key;
     });
+
+    const keySpan = document.createElement('span');
+    keySpan.className = 'option-key';
+    keySpan.textContent = opt.key.toUpperCase();
+
+    const labelEl = document.createElement('label');
+    labelEl.htmlFor = `opt_${opt.key}`;
+    labelEl.appendChild(keySpan);
+    labelEl.appendChild(document.createTextNode(' ' + (opt[lang] || opt.en)));
+
+    li.appendChild(radio);
+    li.appendChild(labelEl);
     list.appendChild(li);
   });
 
