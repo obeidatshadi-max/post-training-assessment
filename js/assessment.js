@@ -195,8 +195,111 @@ function nextQuestion() {
   }
 }
 
-// ── Submit stub (Task 6) ──────────────────────────
-function handleSubmit() { /* Task 6 */ }
+// ── Scoring ───────────────────────────────────────
+function calculateScore() {
+  let score = 0;
+  QUESTIONS.forEach(q => {
+    if (answers[q.id] === q.correct) score++;
+  });
+  return score;
+}
+
+// ── Submit ────────────────────────────────────────
+async function handleSubmit() {
+  const btn = document.getElementById('submitBtn');
+  const errEl = document.getElementById('submitError');
+  errEl.classList.remove('visible');
+
+  const score = calculateScore();
+  const score_pct = Math.round((score / QUESTIONS.length) * 100);
+
+  btn.disabled = true;
+  btn.textContent = t('submitting', lang);
+
+  const payload = {
+    name: participantName,
+    mobile: participantMobile,
+    lang,
+    answers,
+    open_q1: document.getElementById('openQ1').value.trim(),
+    open_q2: document.getElementById('openQ2').value.trim(),
+    open_q3: document.getElementById('openQ3').value.trim(),
+    score,
+    score_pct,
+    auto_flagged: score_pct >= 70
+  };
+
+  const { error } = await db.from('submissions').insert(payload);
+
+  if (error) {
+    btn.disabled = false;
+    btn.textContent = t('submitBtn', lang);
+    errEl.textContent = t('submitError', lang);
+    errEl.classList.add('visible');
+    return;
+  }
+
+  showResults(score, score_pct);
+}
+
+// ── Results ───────────────────────────────────────
+function showResults(score, score_pct) {
+  showScreen('screenResults');
+
+  const gradeClass = score_pct >= 70 ? 'green' : score_pct >= 50 ? 'amber' : 'red';
+  const circle = document.getElementById('scoreCircle');
+  circle.className = 'score-circle ' + gradeClass;
+
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('scoreOut').textContent = t('outOf', lang);
+  document.getElementById('scorePct').textContent = score_pct + '%';
+
+  const gradeKey = score_pct >= 70 ? 'gradeExcellent' : score_pct >= 50 ? 'gradeGood' : 'gradeNeedsWork';
+  document.getElementById('gradeMsg').textContent = t(gradeKey, lang);
+
+  document.getElementById('resultsTitle').textContent = t('resultsTitle', lang);
+  document.getElementById('thankYouTitle').textContent = t('thankYouTitle', lang);
+  document.getElementById('thankYouMsg').textContent = t('thankYouMsg', lang);
+
+  const list = document.getElementById('resultsList');
+  list.innerHTML = '';
+  QUESTIONS.forEach(q => {
+    const isCorrect = answers[q.id] === q.correct;
+    const correctOpt = q.options.find(o => o.key === q.correct);
+    const yourOpt = q.options.find(o => o.key === answers[q.id]);
+
+    const div = document.createElement('div');
+    div.className = 'result-item ' + (isCorrect ? 'correct' : 'wrong');
+
+    const qDiv = document.createElement('div');
+    qDiv.className = 'result-q';
+    const icon = document.createElement('span');
+    icon.className = 'result-icon';
+    icon.textContent = isCorrect ? '✓' : '✗';
+    qDiv.appendChild(icon);
+    qDiv.appendChild(document.createTextNode(q[lang] || q.en));
+    div.appendChild(qDiv);
+
+    if (!isCorrect) {
+      const detail = document.createElement('div');
+      detail.className = 'result-detail';
+      const yourText = yourOpt ? (yourOpt[lang] || yourOpt.en) : '—';
+      const correctText = correctOpt ? (correctOpt[lang] || correctOpt.en) : '—';
+      detail.innerHTML = '';
+      detail.appendChild(document.createTextNode(t('yourAnswerLabel', lang) + ' ' + yourText));
+      detail.appendChild(document.createElement('br'));
+      const correctLabel = document.createElement('span');
+      const strong = document.createElement('strong');
+      strong.textContent = correctText;
+      correctLabel.appendChild(document.createTextNode(t('correctLabel', lang) + ' '));
+      correctLabel.appendChild(strong);
+      detail.appendChild(correctLabel);
+      div.appendChild(detail);
+    }
+
+    list.appendChild(div);
+  });
+}
 
 // ── Init ──────────────────────────────────────────
 applyLang();
