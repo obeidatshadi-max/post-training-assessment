@@ -759,7 +759,7 @@ tr:hover td {
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
 }
 
-.panel-overlay.open .detail-panel {
+.detail-panel.open {
   transform: translateX(0);
 }
 
@@ -870,6 +870,24 @@ tr:hover td {
 .toggle-switch input:checked + .toggle-slider::before {
   transform: translateX(20px);
 }
+
+/* -----------------------------------------
+   Admin-specific Components
+   ----------------------------------------- */
+.logout-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; min-height: 44px; }
+.logout-btn:hover { background: rgba(255,255,255,0.25); }
+
+.notes-textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 0.9rem; min-height: 80px; resize: vertical; font-family: inherit; }
+.notes-textarea:focus { outline: none; border-color: var(--primary); }
+
+.answer-row { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+.answer-row:last-child { border-bottom: none; }
+
+.answer-correct { color: var(--success); font-weight: 700; }
+
+.answer-wrong { color: var(--danger); font-weight: 700; }
+
+.export-btn { margin-left: auto; }
 
 /* -----------------------------------------
    Login

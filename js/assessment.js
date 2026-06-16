@@ -137,7 +137,7 @@ function renderQuestion(index) {
     const radio = document.createElement('input');
     radio.type = 'radio';
     radio.name = `mcq_${q.id}`;
-    radio.id = `opt_${opt.key}`;
+    radio.id = `opt_${q.id}_${opt.key}`;
     radio.value = opt.key;
     if (isChecked) radio.checked = true;
     radio.addEventListener('change', () => {
@@ -149,7 +149,7 @@ function renderQuestion(index) {
     keySpan.textContent = opt.key.toUpperCase();
 
     const labelEl = document.createElement('label');
-    labelEl.htmlFor = `opt_${opt.key}`;
+    labelEl.htmlFor = `opt_${q.id}_${opt.key}`;
     labelEl.appendChild(keySpan);
     labelEl.appendChild(document.createTextNode(' ' + (opt[lang] || opt.en)));
 

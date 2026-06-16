@@ -13,7 +13,7 @@ async function handleLogin() {
 
   const { error } = await db.auth.signInWithPassword({ email, password });
   if (error) {
-    errEl.textContent = error.message;
+    errEl.textContent = 'Invalid email or password. Please try again.';
     errEl.classList.add('visible');
     return;
   }
