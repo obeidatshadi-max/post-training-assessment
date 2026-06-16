@@ -69,6 +69,7 @@ async function handleStart() {
   nameErr.classList.remove('visible');
   mobileErr.textContent = '';
   mobileErr.classList.remove('visible');
+  globalErr.textContent = '';
   globalErr.classList.remove('visible');
 
   let valid = true;
