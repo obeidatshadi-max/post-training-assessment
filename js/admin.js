@@ -104,7 +104,7 @@ function renderTable(rows) {
     const nameTd = document.createElement('td');
     nameTd.textContent = r.name;
     const mobileTd = document.createElement('td');
-    mobileTd.textContent = r.mobile;
+    mobileTd.textContent = r.mobile || r.email || '—';
     const scoreTd = document.createElement('td');
     const badge = document.createElement('span');
     badge.className = 'badge ' + scoreClass;
@@ -132,12 +132,13 @@ function renderTable(rows) {
 
 // ── CSV Export ────────────────────────────────────
 function exportCSV() {
-  const headers = ['Name', 'Mobile', 'Score', 'Score%', 'Auto-Flagged', 'Trainer-Flagged', 'Date', 'Open Q1', 'Open Q2', 'Open Q3', 'Notes'];
+  const headers = ['Name', 'Mobile', 'Email', 'Score', 'Score%', 'Auto-Flagged', 'Trainer-Flagged', 'Date', 'Open Q1', 'Open Q2', 'Open Q3', 'Notes'];
   const escapeCell = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
 
   const rows = filtered.map(r => [
     r.name,
     r.mobile,
+    r.email,
     r.score,
     r.score_pct,
     r.auto_flagged ? 'Yes' : 'No',
@@ -166,7 +167,8 @@ function openPanel(row) {
   activeRow = row;
 
   document.getElementById('panelName').textContent = row.name;
-  document.getElementById('panelMobile').textContent = row.mobile;
+  document.getElementById('panelMobile').textContent = row.mobile || '';
+  document.getElementById('panelEmail').textContent = row.email || '';
 
   const scoreColor = row.score_pct >= 70 ? '#16A34A' : row.score_pct >= 50 ? '#D97706' : '#DC2626';
   const panelScore = document.getElementById('panelScore');
@@ -274,12 +276,12 @@ async function saveNotes() {
   if (idx >= 0) allSubmissions[idx].trainer_notes = notes;
 }
 
-function copyMobile() {
+function copyContact() {
   if (!activeRow) return;
-  navigator.clipboard.writeText(activeRow.mobile).catch(() => {
-    // Fallback for older browsers
+  const value = activeRow.mobile || activeRow.email || '';
+  navigator.clipboard.writeText(value).catch(() => {
     const el = document.createElement('textarea');
-    el.value = activeRow.mobile;
+    el.value = value;
     el.style.position = 'fixed';
     el.style.opacity = '0';
     document.body.appendChild(el);

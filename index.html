@@ -27,10 +27,17 @@
           <input type="text" id="nameInput" placeholder="Full Name" autocomplete="name" />
           <div class="field-error" id="nameError"></div>
         </div>
+        <p class="contact-hint" id="contactHint">Enter mobile number or email — at least one required</p>
         <div class="form-group">
           <label id="mobileLabel">Mobile Number</label>
-          <input type="tel" id="mobileInput" placeholder="07XXXXXXXXX" maxlength="11" inputmode="numeric" />
+          <input type="tel" id="mobileInput" placeholder="07XXXXXXXXX" maxlength="11" inputmode="numeric" autocomplete="tel" />
           <div class="field-error" id="mobileError"></div>
+        </div>
+        <div class="form-divider" id="orDivider"><span id="orText">OR</span></div>
+        <div class="form-group">
+          <label id="emailLabel">Email Address</label>
+          <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email" />
+          <div class="field-error" id="emailError"></div>
         </div>
         <button class="btn btn-primary" id="startBtn" onclick="handleStart()">Start Assessment</button>
         <div class="error-msg" id="regGlobalError"></div>

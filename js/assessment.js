@@ -4,6 +4,7 @@ let currentQ = 0;
 const answers = {};
 let participantName = '';
 let participantMobile = '';
+let participantEmail = '';
 
 // ── Language ──────────────────────────────────────
 function toggleLang() {
@@ -24,6 +25,10 @@ function applyLang() {
   document.getElementById('nameInput').placeholder = t('namePlaceholder', lang);
   document.getElementById('mobileLabel').textContent = t('mobilePlaceholder', lang);
   document.getElementById('mobileInput').placeholder = t('mobilePlaceholder', lang);
+  document.getElementById('emailLabel').textContent = t('emailPlaceholder', lang);
+  document.getElementById('emailInput').placeholder = t('emailPlaceholder', lang);
+  document.getElementById('contactHint').textContent = t('contactHint', lang);
+  document.getElementById('orText').textContent = t('orText', lang);
   document.getElementById('startBtn').textContent = t('startBtn', lang);
   document.getElementById('openTitle').textContent = t('openTitle', lang);
   document.getElementById('openQ1Label').textContent = t('openQ1', lang);
@@ -56,21 +61,25 @@ function validateMobile(m) {
   return /^07\d{9}$/.test(m);
 }
 
+function validateEmail(e) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+}
+
 // ── Registration ──────────────────────────────────
 async function handleStart() {
   const nameVal = document.getElementById('nameInput').value.trim();
   const mobileVal = document.getElementById('mobileInput').value.trim();
+  const emailVal = document.getElementById('emailInput').value.trim().toLowerCase();
   const nameErr = document.getElementById('nameError');
   const mobileErr = document.getElementById('mobileError');
+  const emailErr = document.getElementById('emailError');
   const globalErr = document.getElementById('regGlobalError');
 
   // Clear previous errors
-  nameErr.textContent = '';
-  nameErr.classList.remove('visible');
-  mobileErr.textContent = '';
-  mobileErr.classList.remove('visible');
-  globalErr.textContent = '';
-  globalErr.classList.remove('visible');
+  nameErr.textContent = ''; nameErr.classList.remove('visible');
+  mobileErr.textContent = ''; mobileErr.classList.remove('visible');
+  emailErr.textContent = ''; emailErr.classList.remove('visible');
+  globalErr.textContent = ''; globalErr.classList.remove('visible');
 
   let valid = true;
 
@@ -79,11 +88,26 @@ async function handleStart() {
     nameErr.classList.add('visible');
     valid = false;
   }
-  if (!validateMobile(mobileVal)) {
-    mobileErr.textContent = t('mobileInvalid', lang);
+
+  // Require at least one contact
+  if (!mobileVal && !emailVal) {
+    mobileErr.textContent = t('contactRequired', lang);
     mobileErr.classList.add('visible');
     valid = false;
+  } else {
+    // Validate whichever fields are filled
+    if (mobileVal && !validateMobile(mobileVal)) {
+      mobileErr.textContent = t('mobileInvalid', lang);
+      mobileErr.classList.add('visible');
+      valid = false;
+    }
+    if (emailVal && !validateEmail(emailVal)) {
+      emailErr.textContent = t('emailInvalid', lang);
+      emailErr.classList.add('visible');
+      valid = false;
+    }
   }
+
   if (!valid) return;
 
   const btn = document.getElementById('startBtn');
@@ -91,11 +115,14 @@ async function handleStart() {
   btn.textContent = t('checking', lang);
 
   try {
-    const { data: exists, error } = await db.rpc('check_mobile_exists', { p_mobile: mobileVal });
+    const { data: exists, error } = await db.rpc('check_contact_exists', {
+      p_mobile: mobileVal || null,
+      p_email: emailVal || null
+    });
     if (error) throw error;
     if (exists) {
-      mobileErr.textContent = t('mobileExists', lang);
-      mobileErr.classList.add('visible');
+      globalErr.textContent = t('contactExists', lang);
+      globalErr.classList.add('visible');
       btn.disabled = false;
       btn.textContent = t('startBtn', lang);
       return;
@@ -110,6 +137,7 @@ async function handleStart() {
 
   participantName = nameVal;
   participantMobile = mobileVal;
+  participantEmail = emailVal;
   btn.disabled = false;
   btn.textContent = t('startBtn', lang);
   currentQ = 0;
@@ -218,7 +246,8 @@ async function handleSubmit() {
 
   const payload = {
     name: participantName,
-    mobile: participantMobile,
+    mobile: participantMobile || null,
+    email: participantEmail || null,
     lang,
     answers,
     open_q1: document.getElementById('openQ1').value.trim(),

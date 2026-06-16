@@ -81,7 +81,7 @@
           <thead>
             <tr>
               <th>Name</th>
-              <th>Mobile</th>
+              <th>Contact</th>
               <th>Score</th>
               <th>Auto ⚑</th>
               <th>Trainer ⚑</th>
@@ -105,6 +105,7 @@
       <div>
         <strong id="panelName"></strong>
         <div style="font-size:.82rem;color:#64748B" id="panelMobile"></div>
+        <div style="font-size:.82rem;color:#64748B" id="panelEmail"></div>
       </div>
       <button class="panel-close" onclick="closePanel()">✕</button>
     </div>
@@ -133,7 +134,7 @@
         <textarea class="notes-textarea" id="panelNotes" placeholder="Add notes about this candidate..."></textarea>
         <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
           <button class="btn btn-primary btn-sm" style="width:auto" onclick="saveNotes()">Save Notes</button>
-          <button class="btn btn-outline btn-sm" style="width:auto" onclick="copyMobile()">📋 Copy Mobile</button>
+          <button class="btn btn-outline btn-sm" style="width:auto" onclick="copyContact()">📋 Copy Contact</button>
         </div>
       </div>
     </div>

@@ -923,6 +923,34 @@ tr:hover td {
 }
 
 /* -----------------------------------------
+   Registration — Contact OR divider
+   ----------------------------------------- */
+.contact-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.form-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 12px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.form-divider::before,
+.form-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* -----------------------------------------
    Registration Screen
    ----------------------------------------- */
 .reg-title {
