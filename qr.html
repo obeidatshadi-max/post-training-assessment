@@ -26,7 +26,7 @@
     h1 { font-size: 1.2rem; color: #1E293B; margin-bottom: 4px; }
     p  { color: #64748B; font-size: 0.875rem; margin-bottom: 28px; }
     #qrcode { display: inline-block; margin-bottom: 24px; }
-    #qrcode canvas { border-radius: 8px; }
+    #qrcode img { border-radius: 8px; display: block; }
     .url {
       font-size: 0.8rem;
       color: #2563EB;
@@ -66,27 +66,31 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script>
-    const ASSESSMENT_URL = 'https://post-training-assessment.netlify.app';
-    let qrDataUrl = null;
+    const QR_API = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=' +
+                   encodeURIComponent('https://post-training-assessment.netlify.app');
 
-    QRCode.toDataURL(ASSESSMENT_URL, { width: 260, margin: 2, color: { dark: '#1E293B', light: '#FFFFFF' } }, (err, dataUrl) => {
-      if (err) { console.error(err); return; }
-      qrDataUrl = dataUrl;
-      const img = document.createElement('img');
-      img.src = dataUrl;
-      img.width = 260;
-      img.style.borderRadius = '8px';
-      document.getElementById('qrcode').appendChild(img);
-    });
+    // Display QR image
+    const img = document.createElement('img');
+    img.src = QR_API;
+    img.width = 260;
+    img.alt = 'QR Code';
+    document.getElementById('qrcode').appendChild(img);
 
-    function downloadQR() {
-      if (!qrDataUrl) return;
-      const link = document.createElement('a');
-      link.download = 'post-training-feedback-qr.png';
-      link.href = qrDataUrl;
-      link.click();
+    async function downloadQR() {
+      try {
+        const res = await fetch(QR_API);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'post-training-feedback-qr.png';
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch(e) {
+        // Fallback: open image in new tab → right-click → save
+        window.open(QR_API, '_blank');
+      }
     }
   </script>
 </body>
