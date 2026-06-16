@@ -1,16 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post-Training Assessment</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post-Training Assessment</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-    <div id="app"></div>
-    <script src="js/supabase-config.js"></script>
-    <script src="js/i18n.js"></script>
-    <script src="js/questions.js"></script>
-    <script src="js/assessment.js"></script>
+  <header class="app-header">
+    <div>
+      <h1 id="headerTitle">Sales &amp; Communication Skills</h1>
+      <p id="headerSubtitle">Post-Training Assessment</p>
+    </div>
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">عر</button>
+  </header>
+
+  <div class="container">
+
+    <!-- Screen 1: Registration -->
+    <div class="screen active" id="screenReg">
+      <div class="card">
+        <h2 class="mb-16" id="regTitle">Welcome</h2>
+        <p class="text-muted mb-16" id="regSubtitle">Please register to begin the assessment.</p>
+        <div class="form-group">
+          <label id="nameLabel">Full Name</label>
+          <input type="text" id="nameInput" placeholder="Full Name" autocomplete="name" />
+          <div class="field-error" id="nameError"></div>
+        </div>
+        <div class="form-group">
+          <label id="mobileLabel">Mobile Number</label>
+          <input type="tel" id="mobileInput" placeholder="07XXXXXXXXX" maxlength="11" />
+          <div class="field-error" id="mobileError"></div>
+        </div>
+        <button class="btn btn-primary" id="startBtn" onclick="handleStart()">Start Assessment</button>
+        <div class="error-msg" id="regGlobalError"></div>
+      </div>
+    </div>
+
+    <!-- Screen 2: MCQ (content rendered by JS) -->
+    <div class="screen" id="screenMCQ">
+      <div class="progress-wrap">
+        <div class="progress-label" id="progressLabel">Question 1 of 12</div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:8%"></div></div>
+      </div>
+      <div class="card">
+        <p class="question-text" id="questionText"></p>
+        <ul class="options-list" id="optionsList"></ul>
+        <div class="nav-buttons">
+          <button class="btn btn-outline" id="prevBtn" onclick="prevQuestion()">Back</button>
+          <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen 3: Open Questions -->
+    <div class="screen" id="screenOpen">
+      <div class="card">
+        <h2 class="mb-16" id="openTitle">Open Questions</h2>
+        <div class="form-group">
+          <label id="openQ1Label"></label>
+          <textarea id="openQ1" placeholder=""></textarea>
+        </div>
+        <div class="form-group">
+          <label id="openQ2Label"></label>
+          <textarea id="openQ2" placeholder=""></textarea>
+        </div>
+        <div class="form-group">
+          <label id="openQ3Label"></label>
+          <textarea id="openQ3" placeholder=""></textarea>
+        </div>
+        <button class="btn btn-primary" id="submitBtn" onclick="handleSubmit()">Submit Assessment</button>
+        <div class="error-msg" id="submitError"></div>
+      </div>
+    </div>
+
+    <!-- Screen 4: Results -->
+    <div class="screen" id="screenResults">
+      <div class="card text-center">
+        <h2 id="resultsTitle" class="mb-16">Your Results</h2>
+        <div class="score-circle" id="scoreCircle">
+          <div class="score-number" id="scoreNum"></div>
+          <div class="score-out-of" id="scoreOut"></div>
+        </div>
+        <p id="scorePct" style="font-size:1.4rem;font-weight:700;margin-bottom:8px;"></p>
+        <p class="text-muted" id="gradeMsg"></p>
+      </div>
+      <div id="resultsList"></div>
+      <div class="card text-center mt-16">
+        <h3 id="thankYouTitle">Thank You!</h3>
+        <p class="text-muted mt-8" id="thankYouMsg">Your assessment has been submitted successfully.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/assessment.js"></script>
 </body>
 </html>
