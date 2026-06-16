@@ -1,15 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assessment Admin</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Post-Training Assessment</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
-    <div id="admin-app"></div>
-    <script src="js/supabase-config.js"></script>
-    <script src="js/i18n.js"></script>
-    <script src="js/admin.js"></script>
+<body class="admin-body">
+
+  <!-- Login -->
+  <div id="loginWrap" class="login-wrap">
+    <div class="login-card">
+      <h2>Admin Login</h2>
+      <p class="text-muted mt-8 mb-16">Post-Training Assessment</p>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" value="shadi@psychologytobusiness.com" autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" autocomplete="current-password" />
+      </div>
+      <button class="btn btn-primary" onclick="handleLogin()">Login</button>
+      <div class="error-msg" id="loginError"></div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" style="display:none">
+    <header class="admin-header">
+      <h1>Post-Training Assessment — Dashboard</h1>
+      <button class="logout-btn" onclick="handleLogout()">Logout</button>
+    </header>
+
+    <div class="admin-container">
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-num" id="statTotal">—</div>
+          <div class="stat-label">Total Submissions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statAvg">—</div>
+          <div class="stat-label">Avg Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statAutoFlag">—</div>
+          <div class="stat-label">Auto-Flagged</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statTrainerFlag">—</div>
+          <div class="stat-label">Trainer-Flagged</div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar">
+        <label style="font-size:.85rem;font-weight:600">From</label>
+        <input type="date" id="filterFrom" onchange="applyFilters()" />
+        <label style="font-size:.85rem;font-weight:600">To</label>
+        <input type="date" id="filterTo" onchange="applyFilters()" />
+        <select id="filterScore" onchange="applyFilters()">
+          <option value="all">All Scores</option>
+          <option value="pass">≥70% (Pass)</option>
+          <option value="fail">&lt;70% (Below)</option>
+        </select>
+        <select id="filterFlag" onchange="applyFilters()">
+          <option value="all">All Flags</option>
+          <option value="auto">Auto-Flagged</option>
+          <option value="trainer">Trainer-Flagged</option>
+          <option value="either">Either Flag</option>
+        </select>
+        <button class="btn btn-outline btn-sm export-btn" onclick="exportCSV()">Export CSV</button>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Score</th>
+              <th>Auto ⚑</th>
+              <th>Trainer ⚑</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div id="tableEmpty" style="text-align:center;padding:32px;color:#64748B;display:none">
+          No submissions found.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Detail Panel (Task 8) -->
+  <div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+  <div class="detail-panel" id="detailPanel">
+    <div class="panel-header">
+      <div>
+        <strong id="panelName"></strong>
+        <div style="font-size:.82rem;color:#64748B" id="panelMobile"></div>
+      </div>
+      <button class="panel-close" onclick="closePanel()">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="panel-section">
+        <h3>Score</h3>
+        <div id="panelScore" style="font-size:1.4rem;font-weight:700"></div>
+      </div>
+      <div class="panel-section">
+        <h3>MCQ Answers</h3>
+        <div id="panelAnswers"></div>
+      </div>
+      <div class="panel-section">
+        <h3>Open Questions</h3>
+        <div id="panelOpen"></div>
+      </div>
+      <div class="panel-section">
+        <h3>Trainer Actions</h3>
+        <div class="flag-toggle">
+          <label class="toggle-switch">
+            <input type="checkbox" id="panelTrainerFlag" onchange="saveTrainerFlag()" />
+            <span class="toggle-slider"></span>
+          </label>
+          <span>Trainer Flag</span>
+        </div>
+        <textarea class="notes-textarea" id="panelNotes" placeholder="Add notes about this candidate..."></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" style="width:auto" onclick="saveNotes()">Save Notes</button>
+          <button class="btn btn-outline btn-sm" style="width:auto" onclick="copyMobile()">📋 Copy Mobile</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/admin.js"></script>
 </body>
 </html>
