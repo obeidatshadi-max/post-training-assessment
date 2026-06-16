@@ -68,19 +68,24 @@
 
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script>
-    const URL = 'https://post-training-assessment.netlify.app';
+    const ASSESSMENT_URL = 'https://post-training-assessment.netlify.app';
+    let qrDataUrl = null;
 
-    QRCode.toCanvas(URL, { width: 260, margin: 2, color: { dark: '#1E293B', light: '#FFFFFF' } }, (err, canvas) => {
+    QRCode.toDataURL(ASSESSMENT_URL, { width: 260, margin: 2, color: { dark: '#1E293B', light: '#FFFFFF' } }, (err, dataUrl) => {
       if (err) { console.error(err); return; }
-      document.getElementById('qrcode').appendChild(canvas);
+      qrDataUrl = dataUrl;
+      const img = document.createElement('img');
+      img.src = dataUrl;
+      img.width = 260;
+      img.style.borderRadius = '8px';
+      document.getElementById('qrcode').appendChild(img);
     });
 
     function downloadQR() {
-      const canvas = document.querySelector('#qrcode canvas');
-      if (!canvas) return;
+      if (!qrDataUrl) return;
       const link = document.createElement('a');
       link.download = 'post-training-feedback-qr.png';
-      link.href = canvas.toDataURL('image/png');
+      link.href = qrDataUrl;
       link.click();
     }
   </script>
