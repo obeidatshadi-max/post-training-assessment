@@ -161,12 +161,133 @@ function exportCSV() {
   URL.revokeObjectURL(url);
 }
 
-// ── Panel stubs (Task 8) ──────────────────────────
-function openPanel(row) { /* Task 8 */ }
-function closePanel() { /* Task 8 */ }
-function saveTrainerFlag() { /* Task 8 */ }
-function saveNotes() { /* Task 8 */ }
-function copyMobile() { /* Task 8 */ }
+// ── Detail Panel ──────────────────────────────────
+function openPanel(row) {
+  activeRow = row;
+
+  document.getElementById('panelName').textContent = row.name;
+  document.getElementById('panelMobile').textContent = row.mobile;
+
+  const scoreColor = row.score_pct >= 70 ? '#16A34A' : row.score_pct >= 50 ? '#D97706' : '#DC2626';
+  const panelScore = document.getElementById('panelScore');
+  panelScore.textContent = row.score + '/12 — ' + row.score_pct + '%';
+  panelScore.style.color = scoreColor;
+
+  // MCQ answers
+  const answersEl = document.getElementById('panelAnswers');
+  answersEl.innerHTML = '';
+  QUESTIONS.forEach(q => {
+    const userKey = row.answers[q.id];
+    const isCorrect = userKey === q.correct;
+    const userOpt = q.options.find(o => o.key === userKey);
+    const correctOpt = q.options.find(o => o.key === q.correct);
+
+    const div = document.createElement('div');
+    div.className = 'answer-row';
+
+    const statusSpan = document.createElement('span');
+    statusSpan.className = isCorrect ? 'answer-correct' : 'answer-wrong';
+    statusSpan.textContent = isCorrect ? '✓ ' : '✗ ';
+
+    const qStrong = document.createElement('strong');
+    qStrong.textContent = q.en;
+
+    const br = document.createElement('br');
+
+    const detailSpan = document.createElement('span');
+    detailSpan.style.fontSize = '.82rem';
+    detailSpan.style.color = '#64748B';
+    const userAnswerText = userOpt ? userOpt.en : '—';
+    if (!isCorrect && correctOpt) {
+      detailSpan.textContent = userAnswerText + ' → ';
+      const em = document.createElement('em');
+      em.textContent = correctOpt.en;
+      detailSpan.appendChild(em);
+    } else {
+      detailSpan.textContent = userAnswerText;
+    }
+
+    div.appendChild(statusSpan);
+    div.appendChild(qStrong);
+    div.appendChild(br);
+    div.appendChild(detailSpan);
+    answersEl.appendChild(div);
+  });
+
+  // Open questions
+  const openEl = document.getElementById('panelOpen');
+  openEl.innerHTML = '';
+  [
+    { label: 'Most interesting topic:', value: row.open_q1 },
+    { label: 'Topics for future learning:', value: row.open_q2 },
+    { label: 'Obstacles to career success:', value: row.open_q3 }
+  ].forEach(item => {
+    const p = document.createElement('p');
+    p.style.fontSize = '.88rem';
+    p.style.marginBottom = '10px';
+    const strong = document.createElement('strong');
+    strong.textContent = item.label;
+    p.appendChild(strong);
+    p.appendChild(document.createElement('br'));
+    p.appendChild(document.createTextNode(item.value || '—'));
+    openEl.appendChild(p);
+  });
+
+  document.getElementById('panelTrainerFlag').checked = row.trainer_flagged;
+  document.getElementById('panelNotes').value = row.trainer_notes || '';
+
+  document.getElementById('panelOverlay').classList.add('open');
+  document.getElementById('detailPanel').classList.add('open');
+}
+
+function closePanel() {
+  document.getElementById('panelOverlay').classList.remove('open');
+  document.getElementById('detailPanel').classList.remove('open');
+  activeRow = null;
+}
+
+async function saveTrainerFlag() {
+  if (!activeRow) return;
+  const flagged = document.getElementById('panelTrainerFlag').checked;
+  const { error } = await db
+    .from('submissions')
+    .update({ trainer_flagged: flagged })
+    .eq('id', activeRow.id);
+  if (error) { console.error('Flag save failed:', error.message); return; }
+  activeRow.trainer_flagged = flagged;
+  const idx = allSubmissions.findIndex(r => r.id === activeRow.id);
+  if (idx >= 0) allSubmissions[idx].trainer_flagged = flagged;
+  applyFilters();
+  updateStats(allSubmissions);
+}
+
+async function saveNotes() {
+  if (!activeRow) return;
+  const notes = document.getElementById('panelNotes').value.trim();
+  const { error } = await db
+    .from('submissions')
+    .update({ trainer_notes: notes })
+    .eq('id', activeRow.id);
+  if (error) { console.error('Notes save failed:', error.message); return; }
+  activeRow.trainer_notes = notes;
+  const idx = allSubmissions.findIndex(r => r.id === activeRow.id);
+  if (idx >= 0) allSubmissions[idx].trainer_notes = notes;
+}
+
+function copyMobile() {
+  if (!activeRow) return;
+  navigator.clipboard.writeText(activeRow.mobile).catch(() => {
+    // Fallback for older browsers
+    const el = document.createElement('textarea');
+    el.value = activeRow.mobile;
+    el.style.position = 'fixed';
+    el.style.opacity = '0';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  });
+}
 
 // ── Init ──────────────────────────────────────────
 checkSession();
