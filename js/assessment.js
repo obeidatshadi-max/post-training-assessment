@@ -285,7 +285,6 @@ function showResults(score, score_pct) {
       detail.className = 'result-detail';
       const yourText = yourOpt ? (yourOpt[lang] || yourOpt.en) : '—';
       const correctText = correctOpt ? (correctOpt[lang] || correctOpt.en) : '—';
-      detail.innerHTML = '';
       detail.appendChild(document.createTextNode(t('yourAnswerLabel', lang) + ' ' + yourText));
       detail.appendChild(document.createElement('br'));
       const correctLabel = document.createElement('span');
