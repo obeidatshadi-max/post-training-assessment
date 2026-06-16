@@ -77,6 +77,6 @@ const I18N = {
 
 function t(key, lang, vars = {}) {
   let str = (I18N[lang] || I18N.en)[key] || key;
-  Object.entries(vars).forEach(([k, v]) => { str = str.replace(`{${k}}`, v); });
+  Object.entries(vars).forEach(([k, v]) => { str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), v); });
   return str;
 }
