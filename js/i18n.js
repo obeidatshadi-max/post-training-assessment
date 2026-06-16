@@ -1,8 +1,8 @@
 const I18N = {
   en: {
-    pageTitle: 'Post-Training Assessment',
+    pageTitle: 'Post-Training Feedback',
     headerTitle: 'Sales & Communication Skills',
-    headerSubtitle: 'Post-Training Assessment',
+    headerSubtitle: 'Post-Training Feedback',
     langToggle: 'عر',
     regTitle: 'Welcome',
     regSubtitle: 'Please register to begin the assessment.',
@@ -44,9 +44,9 @@ const I18N = {
     checking: 'Checking...'
   },
   ar: {
-    pageTitle: 'تقييم ما بعد التدريب',
+    pageTitle: 'استبيان ما بعد التدريب',
     headerTitle: 'مهارات البيع والتواصل',
-    headerSubtitle: 'تقييم ما بعد التدريب',
+    headerSubtitle: 'استبيان ما بعد التدريب',
     langToggle: 'EN',
     regTitle: 'أهلاً بك',
     regSubtitle: 'يرجى التسجيل للبدء في التقييم.',
