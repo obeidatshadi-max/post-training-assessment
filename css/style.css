@@ -62,6 +62,8 @@ a  { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 h1, h2, h3 { letter-spacing: -0.02em; }
+/* Negative tracking breaks Arabic letter joining */
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3 { letter-spacing: normal; }
 
 /* -----------------------------------------
    Header
