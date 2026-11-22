@@ -65,11 +65,35 @@ function validateEmail(e) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 }
 
+// Arabic-Indic (٠-٩) and Persian (۰-۹) digits → 0-9
+function toLatinDigits(s) {
+  return s
+    .replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[۰-۹]/g, d => String(d.charCodeAt(0) - 0x06F0));
+}
+
+// Accept the ways people really type an Iraqi number and store one form: 07XXXXXXXXX.
+// "+964 770 123 4567", "00964770...", "964770...", "770 123 4567", "٠٧٧٠١٢٣٤٥٦٧" all become "07701234567".
+function normalizeMobile(raw) {
+  let m = toLatinDigits(raw).replace(/[^\d+]/g, '');
+  m = m.replace(/^\+/, '');
+  if (m.startsWith('00964')) m = m.slice(5);
+  else if (m.startsWith('964')) m = m.slice(3);
+  if (/^7\d{9}$/.test(m)) m = '0' + m;
+  return m;
+}
+
+// Remove stray spaces (common when pasting) and lowercase.
+function normalizeEmail(raw) {
+  return toLatinDigits(raw).replace(/\s+/g, '').toLowerCase();
+}
+
 // ── Registration ──────────────────────────────────
 async function handleStart() {
   const nameVal = document.getElementById('nameInput').value.trim();
-  const mobileVal = document.getElementById('mobileInput').value.trim();
-  const emailVal = document.getElementById('emailInput').value.trim().toLowerCase();
+  const mobileRaw = document.getElementById('mobileInput').value.trim();
+  const mobileVal = mobileRaw ? (normalizeMobile(mobileRaw) || mobileRaw) : '';
+  const emailVal = normalizeEmail(document.getElementById('emailInput').value);
   const nameErr = document.getElementById('nameError');
   const mobileErr = document.getElementById('mobileError');
   const emailErr = document.getElementById('emailError');
@@ -330,4 +354,17 @@ function showResults(score, score_pct) {
 }
 
 // ── Init ──────────────────────────────────────────
+// Enter key starts; typing in a field clears its error and the "need one contact" message.
+['nameInput', 'mobileInput', 'emailInput'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') handleStart(); });
+  el.addEventListener('input', () => {
+    const toClear = [id.replace('Input', 'Error'), 'regGlobalError'];
+    if (id !== 'nameInput') toClear.push('mobileError'); // holds "enter mobile or email"
+    toClear.forEach(eid => {
+      const err = document.getElementById(eid);
+      err.textContent = ''; err.classList.remove('visible');
+    });
+  });
+});
 applyLang();

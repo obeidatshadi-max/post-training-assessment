@@ -227,6 +227,23 @@ textarea {
   display: block;
 }
 
+/* Show / hide password */
+.password-wrap { position: relative; }
+.password-wrap input { padding-right: 72px; }
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 6px 8px;
+}
+
 /* -----------------------------------------
    Buttons
    ----------------------------------------- */

@@ -20,6 +20,15 @@ async function handleLogin() {
   showDashboard();
 }
 
+function togglePassword() {
+  const input = document.getElementById('loginPassword');
+  const btn = document.getElementById('pwToggle');
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.textContent = show ? 'Hide' : 'Show';
+  btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+}
+
 async function handleLogout() {
   await db.auth.signOut();
   document.getElementById('dashboard').style.display = 'none';
